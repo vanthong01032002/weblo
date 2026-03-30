@@ -1,0 +1,298 @@
+/* ===== SITE FOOTER ===== */
+.site-footer {
+  font-family: 'Be Vietnam Pro', Arial, sans-serif;
+  width: 100%;
+}
+
+/* ---------- MAIN FOOTER ---------- */
+.footer-main {
+  background: #0d2d5e;
+  padding: 48px 0 32px;
+}
+
+.footer-main__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 40px;
+}
+
+/* Cột chung */
+.footer-col {
+  color: #b8cce4;
+}
+
+/* Brand */
+.footer-brand__company {
+  margin: 0 0 20px;
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.footer-info {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footer-info li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #b8cce4;
+}
+
+.footer-info__icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin-top: 3px;
+  color: #42a5f5;
+}
+
+/* Tiêu đề cột */
+.footer-col__title {
+  margin: 0 0 16px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #1565c0;
+}
+
+/* Links */
+.footer-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.footer-links li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+}
+
+.footer-links li::before {
+  content: "›";
+  color: #42a5f5;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.footer-links a {
+  color: #b8cce4;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.footer-links a:hover {
+  color: #42a5f5;
+}
+
+/* Hỗ trợ */
+.footer-support__label {
+  font-size: 0.8rem;
+  color: #b8cce4;
+  margin: 0 0 4px;
+}
+
+.footer-support__phone {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #42a5f5;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.footer-support__phone:hover {
+  color: #fff;
+}
+
+.footer-support__phone--alt {
+  color: #90caf9;
+}
+
+.footer-support__follow {
+  font-size: 0.8rem;
+  color: #b8cce4;
+  margin: 16px 0 8px;
+}
+
+/* Social */
+.footer-social {
+  display: flex;
+  gap: 8px;
+}
+
+.footer-social__link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  color: #fff;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.footer-social__link:hover {
+  background: #1565c0;
+}
+
+.footer-social__link svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Fanpage */
+.footer-fanpage {
+  border-radius: 8px;
+  overflow: hidden;
+  line-height: 0;
+}
+
+/* ---------- COPYRIGHT BAR ---------- */
+.footer-copy {
+  background: #1565c0;
+  padding: 12px 24px;
+  text-align: center;
+}
+
+.footer-copy p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #e3f2fd;
+}
+
+.footer-copy strong {
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 960px) {
+  .footer-main__inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+  }
+}
+
+@media (max-width: 560px) {
+  .footer-main__inner {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+/* ===== FLOATING BUTTONS ===== */
+.float-btns {
+  position: fixed;
+  right: 20px;
+  bottom: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 9999;
+}
+
+.float-btn {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  transition: transform 0.2s;
+}
+
+.float-btn:hover {
+  transform: scale(1.12);
+}
+
+.float-btn--zalo  { background: #0068ff; }
+.float-btn--phone { background: #1565c0; }
+
+.float-btn--phone svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Pulse ring */
+.float-btn__pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  animation: float-pulse 2s ease-out infinite;
+}
+
+.float-btn--zalo  .float-btn__pulse { background: rgba(0, 104, 255, 0.4); }
+.float-btn--phone .float-btn__pulse { background: rgba(21, 101, 192, 0.4); }
+
+/* Stagger phone pulse */
+.float-btn--phone .float-btn__pulse {
+  animation-delay: 0.6s;
+}
+
+@keyframes float-pulse {
+  0%   { transform: scale(1);   opacity: 0.8; }
+  70%  { transform: scale(1.7); opacity: 0; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+
+/* Shake animation on phone button */
+.float-btn--phone {
+  animation: float-shake 3s ease-in-out infinite;
+}
+
+@keyframes float-shake {
+  0%, 100% { transform: rotate(0deg); }
+  10%       { transform: rotate(-12deg); }
+  20%       { transform: rotate(12deg); }
+  30%       { transform: rotate(-8deg); }
+  40%       { transform: rotate(8deg); }
+  50%       { transform: rotate(0deg); }
+}
+
+.float-btn--phone:hover {
+  animation: none;
+  transform: scale(1.12);
+}
+
+/* Google Maps */
+.footer-map {
+  width: 100%;
+  line-height: 0;
+}
+
+.footer-map iframe {
+  display: block;
+  width: 100%;
+  height: 380px;
+  border: none;
+}

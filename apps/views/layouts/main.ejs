@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= (typeof seo !== 'undefined' && seo && seo.title) ? seo.title : ((typeof settings !== 'undefined' && settings.site_title) ? settings.site_title : title) %></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <% if (typeof seo !== 'undefined' && seo) { %>
+      <% if (seo.keywords) { %><meta name="keywords" content="<%= seo.keywords %>"><% } %>
+      <% if (seo.description) { %><meta name="description" content="<%= seo.description %>"><% } %>
+      <% if (seo.og_image) { %>
+        <meta property="og:image" content="<%= seo.og_image %>">
+        <meta property="og:title" content="<%= seo.title || title %>">
+        <meta property="og:description" content="<%= seo.description || '' %>">
+        <meta property="og:type" content="website">
+      <% } %>
+    <% } %>
+    <% const faviconPath = (typeof settings !== 'undefined' && settings.favicon_path) ? settings.favicon_path : '/images/favicon.ico'; %>
+    <link rel="icon" type="image/x-icon" href="<%= faviconPath %>">
+    <link rel="shortcut icon" href="<%= faviconPath %>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/footer.css">
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/dich-vu.css">
+    <link rel="stylesheet" href="/css/khach-hang.css">
+    <link rel="stylesheet" href="/css/ve-chung-toi.css">
+    <link rel="stylesheet" href="/css/kho-giao-dien.css">
+    <link rel="stylesheet" href="/css/blog.css">
+    <link rel="stylesheet" href="/css/lien-he.css">
+</head>
+<body>
+
+    <%- include('../partials/header') %>
+
+    <main>
+        <%- body %> <!-- 🔥 QUAN TRỌNG -->
+    </main>
+
+    <%- include('../partials/footer') %>
+
+</body>
+</html>
