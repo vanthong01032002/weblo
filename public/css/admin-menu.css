@@ -2333,3 +2333,46 @@
 @media (max-width: 768px) {
   .popup-admin-layout { grid-template-columns: 1fr; }
 }
+
+/* ===== ADMIN FORM ACTION BAR (top + bottom) ===== */
+.admin-form-actions-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 12px 0;
+  margin-bottom: 16px;
+}
+
+.admin-form-actions-bar--bottom {
+  margin-top: 24px;
+  margin-bottom: 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--admin-border);
+}
+
+.admin-form-actions-bar .admin-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Sticky top bar khi scroll */
+.admin-form-actions-bar--sticky {
+  position: sticky;
+  top: 76px;
+  z-index: 150;
+  background: var(--admin-bg-page);
+  padding: 10px 0;
+  margin-left: -24px;
+  margin-right: -24px;
+  padding-left: 24px;
+  padding-right: 24px;
+  border-bottom: 1px solid var(--admin-border);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+[data-theme="dark"] .admin-form-actions-bar--sticky {
+  background: #0f1117;
+  border-bottom-color: #2a2d35;
+}
