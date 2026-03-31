@@ -6,6 +6,25 @@ const fs = require('fs');
 
 const adminController = require('../controllers/adminController');
 
+// ===== MULTER ERROR HANDLER MIDDLEWARE =====
+function handleMulterError(err, req, res, next) {
+    if (err && err.code === 'LIMIT_FILE_SIZE') {
+        const back = req.headers.referer || '/admin';
+        // Lấy giới hạn MB từ limit (bytes)
+        const mb = err.field ? '' : '';
+        return res.redirect(back + (back.includes('?') ? '&' : '?') + 'error=File ảnh quá lớn. Vui lòng chọn file nhỏ hơn 5MB.');
+    }
+    if (err && err.code === 'LIMIT_UNEXPECTED_FILE') {
+        const back = req.headers.referer || '/admin';
+        return res.redirect(back + (back.includes('?') ? '&' : '?') + 'error=Loại file không được hỗ trợ.');
+    }
+    if (err) {
+        const back = req.headers.referer || '/admin';
+        return res.redirect(back + (back.includes('?') ? '&' : '?') + `error=${encodeURIComponent(err.message || 'Lỗi upload file.')}`);
+    }
+    next();
+}
+
 // Multer config cho slideshow
 const uploadDir = path.join(__dirname, '../../public/uploads/slideshow');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
@@ -35,6 +54,24 @@ router.get('/admin', adminController.dashboard);
 // Settings
 router.get('/admin/settings',  adminController.settingsIndex);
 router.post('/admin/settings', adminController.settingsSave);
+
+// Popup
+const popupUploadDir = path.join(__dirname, '../../public/uploads/popup');
+if (!fs.existsSync(popupUploadDir)) fs.mkdirSync(popupUploadDir, { recursive: true });
+const uploadPopup = multer({
+    storage: multer.diskStorage({
+        destination: (req, file, cb) => cb(null, popupUploadDir),
+        filename: (req, file, cb) => cb(null, 'popup_' + Date.now() + path.extname(file.originalname))
+    }),
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter: (req, file, cb) => {
+        const ok = /jpeg|jpg|png|gif|webp|avif/.test(path.extname(file.originalname).toLowerCase());
+        ok ? cb(null, true) : cb(new Error('Chỉ chấp nhận file ảnh'));
+    }
+});
+
+router.get('/admin/pages/popup',  adminController.popupIndex);
+router.post('/admin/pages/popup', uploadPopup.single('image'), adminController.popupSave);
 
 // Logo & Favicon upload
 const mediaUploadDir = require('path').join(__dirname, '../../public/uploads/media');
@@ -285,5 +322,8 @@ router.get('/admin/media/clients/edit/:id',     adminController.clientEdit);
 router.post('/admin/media/clients/update/:id',  uploadClient.single('avatar'), adminController.clientUpdate);
 router.delete('/admin/media/clients/:id',       adminController.clientDelete);
 router.post('/admin/media/clients/toggle/:id',  adminController.clientToggle);
+
+// ===== GLOBAL MULTER ERROR HANDLER =====
+router.use(handleMulterError);
 
 module.exports = router;

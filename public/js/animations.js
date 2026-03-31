@@ -1,5 +1,5 @@
-/**
- * Webtop Homepage Animations
+﻿/**
+ * Devora Homepage Animations
  * - Counter animation (0 → số)
  * - Fade-in / slide-up khi scroll vào viewport
  * - Hover effects

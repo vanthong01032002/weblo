@@ -18,6 +18,7 @@ router.post('/lien-he', userController.lienHeSend);
 router.get('/api/check-domain', userController.checkDomain);
 
 // Thiết kế website sub-pages
+router.get('/thiet-ke-website',            userController.tkwIndex);
 router.get('/thiet-ke-website/gioi-thieu', userController.tkwGioiThieu);
 router.get('/thiet-ke-website/bang-gia',   userController.tkwBangGia);
 router.get('/thiet-ke-website/portfolio',  userController.tkwPortfolio);

@@ -175,3 +175,42 @@
   .tkw-why__grid, .tkw-portfolio-grid { grid-template-columns: 1fr; }
   .tkw-stats__grid { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* Sub-nav */
+.tkw-subnav {
+  background: #fff;
+  border-bottom: 2px solid #e8eef8;
+  position: sticky;
+  top: 76px;
+  z-index: 100;
+}
+
+.tkw-subnav__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  gap: 0;
+}
+
+.tkw-subnav__link {
+  display: inline-flex;
+  align-items: center;
+  padding: 14px 20px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #555;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.tkw-subnav__link:hover { color: #1565c0; }
+.tkw-subnav__link--active { color: #1565c0; border-bottom-color: #1565c0; }
+
+@media (max-width: 560px) {
+  .tkw-subnav__inner { overflow-x: auto; gap: 0; }
+  .tkw-subnav__link { padding: 12px 14px; font-size: 0.85rem; }
+}

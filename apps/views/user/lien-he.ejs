@@ -1,4 +1,4 @@
-<!-- Hero -->
+﻿<!-- Hero -->
 <section class="contact-hero" <% if (contactPage && contactPage.image_path) { %>style="background-image: linear-gradient(rgba(13,45,94,0.75), rgba(13,45,94,0.75)), url('<%= contactPage.image_path %>'); background-size:cover; background-position:center;"<% } %>>
   <div class="contact-hero__inner">
     <h1><%= contactPage && contactPage.title ? contactPage.title : 'Liên hệ với chúng tôi' %></h1>
@@ -40,7 +40,7 @@
         </div>
         <div>
           <strong>Email</strong>
-          <p><a href="mailto:<%= (typeof settings !== 'undefined' && settings.email) ? settings.email : 'info@webtop.vn' %>"><%= (typeof settings !== 'undefined' && settings.email) ? settings.email : 'info@webtop.vn' %></a></p>
+          <p><a href="mailto:<%= (typeof settings !== 'undefined' && settings.email) ? settings.email : 'info@devora.vn' %>"><%= (typeof settings !== 'undefined' && settings.email) ? settings.email : 'info@devora.vn' %></a></p>
         </div>
       </div>
 

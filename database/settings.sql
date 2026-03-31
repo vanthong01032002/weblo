@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS site_settings (
+﻿CREATE TABLE IF NOT EXISTS site_settings (
   id INT AUTO_INCREMENT PRIMARY KEY,
   `key` VARCHAR(100) NOT NULL UNIQUE,
   `value` TEXT DEFAULT NULL,
@@ -6,21 +6,21 @@ CREATE TABLE IF NOT EXISTS site_settings (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO site_settings (`key`, `value`) VALUES
-('site_name',       'Công ty TNHH Webtop'),
-('site_title',      'Webtop - Thiết kế website chuyên nghiệp'),
+('site_name',       'Công ty TNHH Công Nghệ Devora'),
+('site_title',      'Devora - Thiết kế website chuyên nghiệp'),
 ('address',         '213 Chu Văn An, Phường 26, Quận Bình Thạnh, TPHCM'),
 ('phone',           '028.3715.4879'),
 ('phone2',          '028.3715.4878'),
 ('hotline',         '0912.817.117'),
 ('hotline2',        '0915.101.017'),
-('email',           'info@webtop.vn'),
-('website',         'https://webtop.vn'),
+('email',           'info@devora.vn'),
+('website',         'https://devora.vn'),
 ('zalo',            'https://zalo.me/0912817117'),
-('fanpage',         'https://www.facebook.com/webtop.vn'),
+('fanpage',         'https://www.facebook.com/devora.vn'),
 ('google_maps',     'https://maps.google.com'),
 ('working_hours',   '8h00 đến 17h30 (Thứ 2 - Thứ 7)'),
-('copyright',       'Copyright © 2012. Bản quyền website Webtop'),
-('fanpage_embed',   'https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fwebtop.vn&tabs=timeline&width=260&height=200&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=true')
+('copyright',       'Copyright © 2012. Bản quyền website Devora'),
+('fanpage_embed',   'https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fdevora.vn&tabs=timeline&width=260&height=200&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=true')
 ON DUPLICATE KEY UPDATE `key` = `key`;
 
 -- Logo và Favicon

@@ -1,4 +1,4 @@
-require('dotenv').config();
+﻿require('dotenv').config();
 
 const express = require('express');
 const path = require('path');
@@ -23,7 +23,7 @@ app.use(express.json());
 
 // Session
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'webtop_secret_2024',
+    secret: process.env.SESSION_SECRET || 'devora_secret_2024',
     resave: false,
     saveUninitialized: false,
     cookie: { maxAge: 24 * 60 * 60 * 1000 } // 1 ngày
@@ -55,6 +55,19 @@ const SOCIAL_ICONS = {
 
 app.locals.getSocialIcon = (type) => SOCIAL_ICONS[type] || SOCIAL_ICONS.custom;
 app.locals.tinymceKey = process.env.TINYMCE_KEY || 'no-api-key';
+
+// Inject popup vào mọi trang user
+const PopupModel = require('./apps/models/popupModel');
+app.use(async (req, res, next) => {
+    if (!req.path.startsWith('/admin') && !req.path.startsWith('/api') &&
+        !req.path.match(/\.(css|js|png|jpg|jpeg|gif|ico|svg|webp|avif|woff|woff2)$/)) {
+        try {
+            const popup = await PopupModel.get();
+            res.locals.sitePopup = (popup && popup.is_active) ? popup : null;
+        } catch { res.locals.sitePopup = null; }
+    }
+    next();
+});
 
 // routes
 const userRoutes = require('./apps/routes/userRoutes');

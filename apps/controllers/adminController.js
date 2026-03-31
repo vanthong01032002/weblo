@@ -1,4 +1,4 @@
-const SlideshowModel = require('../models/slideshowModel');
+﻿const SlideshowModel = require('../models/slideshowModel');
 const PricingModel   = require('../models/pricingModel');
 const { VisitorModel } = require('../models/visitorModel');
 const path = require('path');
@@ -1073,7 +1073,7 @@ exports.clientIndex = async (req, res) => {
     try {
         const clients = await ClientModel.getAll();
         res.render('admin/clients/index', {
-            layout: 'layouts/admin', title: 'Khách hàng của Webtop',
+            layout: 'layouts/admin', title: 'Khách hàng của Devora',
             clients, success: req.query.success || null, error: req.query.error || null
         });
     } catch (err) { res.redirect('/admin?error=Lỗi tải khách hàng'); }
@@ -1139,4 +1139,42 @@ exports.clientDelete = async (req, res) => {
 exports.clientToggle = async (req, res) => {
     try { await ClientModel.toggleActive(req.params.id, req.body.is_active); res.json({ success: true }); }
     catch (err) { res.json({ success: false }); }
+};
+
+// ===== POPUP =====
+const PopupModel  = require('../models/popupModel');
+const pathPopup   = require('path');
+const fsPopup     = require('fs');
+
+exports.popupIndex = async (req, res) => {
+    try {
+        const popup = await PopupModel.get();
+        res.render('admin/popup/index', {
+            layout: 'layouts/admin', title: 'Cấu hình Popup',
+            popup: popup || {}, success: req.query.success || null, error: req.query.error || null
+        });
+    } catch (err) { res.redirect('/admin?error=Lỗi tải popup'); }
+};
+
+exports.popupSave = async (req, res) => {
+    try {
+        const { title, content, link, delay_seconds, show_once, is_active } = req.body;
+        const current = await PopupModel.get();
+        let image_path = current ? current.image_path : null;
+        if (req.file) {
+            if (image_path && image_path.startsWith('/uploads/')) {
+                const old = pathPopup.join(__dirname, '../../public', image_path);
+                if (fsPopup.existsSync(old)) fsPopup.unlinkSync(old);
+            }
+            image_path = '/uploads/popup/' + req.file.filename;
+        }
+        await PopupModel.save({
+            title: title || null, content: content || null,
+            link: link || null, image_path,
+            delay_seconds: parseInt(delay_seconds) || 3,
+            show_once: show_once === '1' ? 1 : 0,
+            is_active: is_active === '1' ? 1 : 0
+        });
+        res.redirect('/admin/pages/popup?success=Lưu popup thành công');
+    } catch (err) { res.redirect('/admin/pages/popup?error=Lỗi lưu popup'); }
 };

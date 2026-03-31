@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS social_footer (
+﻿CREATE TABLE IF NOT EXISTS social_footer (
   id INT AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(100) NOT NULL,
   link VARCHAR(500) NOT NULL,
@@ -10,6 +10,6 @@ CREATE TABLE IF NOT EXISTS social_footer (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO social_footer (title, link, icon_type, display_order, is_active) VALUES
-('Facebook', 'https://www.facebook.com/webtop.vn', 'facebook', 1, 1),
-('YouTube', 'https://www.youtube.com/@webtop', 'youtube', 2, 1),
+('Facebook', 'https://www.facebook.com/devora.vn', 'facebook', 1, 1),
+('YouTube', 'https://www.youtube.com/@devora', 'youtube', 2, 1),
 ('Zalo', 'https://zalo.me/0912817117', 'zalo', 3, 1);

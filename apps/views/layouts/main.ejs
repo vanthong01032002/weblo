@@ -42,5 +42,41 @@
     <%- include('../partials/footer') %>
     <script src="/js/animations.js" defer></script>
 
+    <% if (typeof sitePopup !== 'undefined' && sitePopup) { %>
+    <div class="site-popup-overlay" id="sitePopupOverlay">
+      <div class="site-popup-box">
+        <button class="site-popup-close" id="sitePopupClose" aria-label="Đóng">✕</button>
+        <% if (sitePopup.image_path) { %>
+          <div class="site-popup-img"><img src="<%= sitePopup.image_path %>" alt="<%= sitePopup.title || '' %>"></div>
+        <% } %>
+        <% if (sitePopup.title || sitePopup.content) { %>
+        <div class="site-popup-body">
+          <% if (sitePopup.title) { %><h3><%= sitePopup.title %></h3><% } %>
+          <% if (sitePopup.content) { %><p><%= sitePopup.content %></p><% } %>
+          <% if (sitePopup.link) { %><a href="<%= sitePopup.link %>" class="site-popup-btn">Xem ngay</a><% } %>
+        </div>
+        <% } %>
+      </div>
+    </div>
+    <script>
+    (function() {
+      const delay = <%= sitePopup.delay_seconds || 3 %> * 1000;
+      const showOnce = <%= sitePopup.show_once ? 'true' : 'false' %>;
+      const cookieKey = 'popup_shown_v1';
+      if (showOnce && document.cookie.includes(cookieKey + '=1')) return;
+      setTimeout(function() {
+        document.getElementById('sitePopupOverlay').classList.add('is-open');
+        if (showOnce) document.cookie = cookieKey + '=1;path=/;max-age=86400';
+      }, delay);
+      document.getElementById('sitePopupClose').addEventListener('click', function() {
+        document.getElementById('sitePopupOverlay').classList.remove('is-open');
+      });
+      document.getElementById('sitePopupOverlay').addEventListener('click', function(e) {
+        if (e.target === this) this.classList.remove('is-open');
+      });
+    })();
+    </script>
+    <% } %>
+
 </body>
 </html>
