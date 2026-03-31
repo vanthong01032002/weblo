@@ -25,21 +25,33 @@
 
   /* ===== COUNTER ANIMATION ===== */
   function animateCounter(el) {
+    if (el.dataset.counted) return; // tránh chạy lại
+    el.dataset.counted = '1';
+
     const text = el.textContent.trim();
-    const suffix = text.replace(/[\d,\.]/g, ''); // "+", "%", ...
-    const target = parseFloat(text.replace(/[^\d.]/g, '')) || 0;
-    const duration = 1800;
-    const start = performance.now();
+    // Tách prefix số và suffix ("+", "%", ...)
+    const match = text.match(/^([\d,\.]+)(.*)$/);
+    if (!match) return;
+    const target   = parseFloat(match[1].replace(/,/g, '')) || 0;
+    const suffix   = match[2] || '';
+    const duration = 2000;
+    const startTime = performance.now();
+
+    function easeOutQuart(t) {
+      return 1 - Math.pow(1 - t, 4);
+    }
 
     function step(now) {
-      const elapsed = now - start;
+      const elapsed  = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      // easeOutExpo
-      const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-      const current = Math.floor(ease * target);
+      const ease     = easeOutQuart(progress);
+      const current  = Math.round(ease * target);
       el.textContent = current + suffix;
-      if (progress < 1) requestAnimationFrame(step);
-      else el.textContent = target + suffix;
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      } else {
+        el.textContent = target + suffix;
+      }
     }
 
     requestAnimationFrame(step);
@@ -103,10 +115,10 @@
 
     onVisible(headingSelectors.join(','), addFadeClass, { threshold: 0.3 });
 
-    // 4. Stats section — trigger counter khi section vào view
+    // 4. Stats section — trigger counter khi section vào view (đã có guard data-counted)
     onVisible('.stats-section, .kh-stats, .about-stats', function (section) {
       section.querySelectorAll('.stat-number, .kh-stat__num, .about-stat__num').forEach(animateCounter);
-    }, { threshold: 0.3 });
+    }, { threshold: 0.2 });
 
     // 5. Process cubes — bounce khi vào view
     onVisible('.process-step__cube', function (el) {
