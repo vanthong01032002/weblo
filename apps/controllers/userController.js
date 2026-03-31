@@ -125,3 +125,96 @@ exports.lienHeSend = async (req, res) => {
         res.redirect('/lien-he');
     }
 };
+
+// ===== THIẾT KẾ WEBSITE SUB-PAGES =====
+
+// Giới thiệu dịch vụ thiết kế website
+exports.tkwGioiThieu = async (req, res) => {
+    const [socialButtons, socialFooter, settings, seo] = await Promise.all([
+        getSocialButtons(), getSocialFooter(), getSettings(), SeoModel.getByKey('home')
+    ]);
+    res.render('user/tkw/gioi-thieu', {
+        layout: 'layouts/main',
+        title: 'Giới thiệu dịch vụ thiết kế website | Webtop',
+        socialButtons, socialFooter, settings, seo
+    });
+};
+
+// Bảng giá thiết kế website
+exports.tkwBangGia = async (req, res) => {
+    const [pricing, socialButtons, socialFooter, settings] = await Promise.all([
+        PricingModel.getAllActive(), getSocialButtons(), getSocialFooter(), getSettings()
+    ]);
+    res.render('user/tkw/bang-gia', {
+        layout: 'layouts/main',
+        title: 'Bảng giá thiết kế website | Webtop',
+        pricing, socialButtons, socialFooter, settings, seo: {}
+    });
+};
+
+// Portfolio / dự án đã thực hiện
+exports.tkwPortfolio = async (req, res) => {
+    const [socialButtons, socialFooter, settings] = await Promise.all([
+        getSocialButtons(), getSocialFooter(), getSettings()
+    ]);
+    res.render('user/tkw/portfolio', {
+        layout: 'layouts/main',
+        title: 'Portfolio - Dự án thiết kế website | Webtop',
+        socialButtons, socialFooter, settings, seo: {}
+    });
+};
+
+// ===== DOMAIN CHECK =====
+const https = require('https');
+
+exports.checkDomain = async (req, res) => {
+    const domain = (req.query.domain || '').trim().toLowerCase()
+        .replace(/^https?:\/\//,'').replace(/\/.*$/,'');
+
+    if (!domain || !/^[a-z0-9][a-z0-9\-\.]{1,61}[a-z0-9]\.[a-z]{2,}$/.test(domain)) {
+        return res.json({ error: 'Tên miền không hợp lệ' });
+    }
+
+    try {
+        // Dùng RDAP (free, không cần API key)
+        const tld = domain.split('.').slice(-1)[0];
+        const rdapUrl = `https://rdap.org/domain/${domain}`;
+
+        const data = await new Promise((resolve, reject) => {
+            https.get(rdapUrl, { headers: { 'Accept': 'application/json' } }, (resp) => {
+                let body = '';
+                resp.on('data', chunk => body += chunk);
+                resp.on('end', () => {
+                    try { resolve({ status: resp.statusCode, body: JSON.parse(body) }); }
+                    catch { resolve({ status: resp.statusCode, body: {} }); }
+                });
+            }).on('error', reject);
+        });
+
+        if (data.status === 200 && data.body.ldhName) {
+            // Domain đã được đăng ký
+            const events = data.body.events || [];
+            const expiry = events.find(e => e.eventAction === 'expiration');
+            const created = events.find(e => e.eventAction === 'registration');
+            return res.json({
+                domain,
+                available: false,
+                status: 'registered',
+                expiry: expiry ? expiry.eventDate : null,
+                created: created ? created.eventDate : null,
+                registrar: data.body.entities?.[0]?.vcardArray?.[1]?.find(v => v[0] === 'fn')?.[3] || null
+            });
+        } else {
+            return res.json({ domain, available: true, status: 'available' });
+        }
+    } catch (err) {
+        // Fallback: nếu RDAP lỗi, thử DNS lookup
+        const dns = require('dns').promises;
+        try {
+            await dns.lookup(domain);
+            return res.json({ domain, available: false, status: 'registered' });
+        } catch {
+            return res.json({ domain, available: true, status: 'available' });
+        }
+    }
+};

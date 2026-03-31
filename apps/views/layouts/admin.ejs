@@ -8,6 +8,7 @@
 </head>
 <body class="admin-body">
 
+    <div class="admin-sidebar-overlay" id="sidebarOverlay"></div>
     <%- include('../partials/admin_sidebar') %>
 
     <div class="admin-content">
@@ -16,10 +17,44 @@
             <%- body %>
         </main>
         <footer class="admin-footer">
-            © 2026, Developed by Nasani
+            © 2012, Developed by weblo
         </footer>
     </div>
 
     <script src="/js/admin-menu.js" defer></script>
+    <script>
+    // Mobile sidebar toggle
+    document.addEventListener('DOMContentLoaded', function() {
+        const hamburger   = document.getElementById('adminHamburger');
+        const sidebar     = document.querySelector('.admin-sidebar');
+        const overlay     = document.getElementById('sidebarOverlay');
+        const closeBtn    = document.getElementById('sidebarClose');
+        if (!hamburger || !sidebar) return;
+
+        function openSidebar() {
+            sidebar.classList.add('is-open');
+            overlay.classList.add('is-open');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeSidebar() {
+            sidebar.classList.remove('is-open');
+            overlay.classList.remove('is-open');
+            document.body.style.overflow = '';
+        }
+
+        hamburger.addEventListener('click', function() {
+            sidebar.classList.contains('is-open') ? closeSidebar() : openSidebar();
+        });
+        overlay.addEventListener('click', closeSidebar);
+        if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+
+        // Close on nav link click (mobile)
+        sidebar.querySelectorAll('a').forEach(function(a) {
+            a.addEventListener('click', function() {
+                if (window.innerWidth <= 768) closeSidebar();
+            });
+        });
+    });
+    </script>
 </body>
 </html>

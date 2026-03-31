@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
+const session = require('express-session');
 
 const app = express();
 
@@ -19,6 +20,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 // body parser
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+// Session
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'webtop_secret_2024',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 24 * 60 * 60 * 1000 } // 1 ngày
+}));
 
 // ===== HELPER: getSocialIcon =====
 const SOCIAL_ICONS = {
@@ -40,7 +49,17 @@ app.locals.tinymceKey = process.env.TINYMCE_KEY || 'no-api-key';
 const userRoutes = require('./apps/routes/userRoutes');
 app.use('/', userRoutes);
 
+// Auth routes (không cần middleware)
+const authController = require('./apps/controllers/authController');
+app.get('/admin/user/login',  authController.loginPage);
+app.post('/admin/user/login', authController.loginPost);
+app.get('/admin/user/logout', authController.logout);
+
 const adminRoutes = require('./apps/routes/adminRoutes');
+
+// Auth middleware bảo vệ toàn bộ /admin
+const adminAuth = require('./apps/middleware/adminAuth');
+app.use('/admin', adminAuth);
 
 // Middleware: inject adminSiteUrl từ settings vào mọi trang admin
 const SettingsModel = require('./apps/models/settingsModel');

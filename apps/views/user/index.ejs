@@ -78,6 +78,109 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
+<!-- ===== DOMAIN CHECK ===== -->
+<section class="domain-check">
+  <div class="domain-check__inner">
+    <div class="domain-check__text">
+      <h2>Kiểm Tra Tên Miền</h2>
+      <p>Đăng ký tên miền ngay từ bây giờ để bảo vệ thương hiệu của bạn</p>
+      <div class="domain-check__form" id="domainForm">
+        <div class="domain-check__input-wrap">
+          <input type="text" id="domainInput" placeholder="Nhập tên miền bạn muốn tìm kiếm..."
+                 autocomplete="off" spellcheck="false">
+          <span class="domain-check__mic">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1 1.93c-3.94-.49-7-3.85-7-7.93H2c0 4.42 3.16 8.09 7.35 8.82V21h2v-3.07c.22-.04.44-.09.65-.15zM12 16c.34 0 .67-.03 1-.08V21h-2v-5.08c.33.05.66.08 1 .08z"/></svg>
+          </span>
+        </div>
+        <button class="domain-check__btn" id="domainBtn" onclick="checkDomain()">Kiểm Tra</button>
+      </div>
+      <!-- TLD prices -->
+      <div class="domain-tlds">
+        <div class="domain-tld">.vn <span>820.000đ</span></div>
+        <div class="domain-tld">.com.vn <span>691.000đ</span></div>
+        <div class="domain-tld">.edu.vn <span>397.000đ</span></div>
+        <div class="domain-tld">.com <span>350.000đ</span></div>
+        <div class="domain-tld">.net <span>380.000đ</span></div>
+      </div>
+    </div>
+    <div class="domain-check__img">
+      <img src="/images/hero-main.png" alt="Kiểm tra tên miền">
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div class="domain-result" id="domainResult" style="display:none;">
+    <div class="domain-result__inner" id="domainResultInner"></div>
+  </div>
+</section>
+
+<script>
+async function checkDomain() {
+  const input = document.getElementById('domainInput');
+  const btn   = document.getElementById('domainBtn');
+  const result = document.getElementById('domainResult');
+  const inner  = document.getElementById('domainResultInner');
+
+  let domain = input.value.trim().toLowerCase()
+    .replace(/^https?:\/\//,'').replace(/\/.*$/,'');
+
+  if (!domain) { input.focus(); return; }
+
+  // Thêm .com nếu không có TLD
+  if (!domain.includes('.')) domain += '.com';
+
+  btn.textContent = 'Đang kiểm tra...';
+  btn.disabled = true;
+  result.style.display = 'none';
+
+  try {
+    const resp = await fetch('/api/check-domain?domain=' + encodeURIComponent(domain));
+    const data = await resp.json();
+
+    if (data.error) {
+      inner.innerHTML = `<div class="dr-error"><svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>${data.error}</div>`;
+    } else if (data.available) {
+      inner.innerHTML = `
+        <div class="dr-available">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+          <div>
+            <strong>${data.domain}</strong> — Tên miền còn trống, có thể đăng ký!
+          </div>
+          <a href="/lien-he" class="dr-btn dr-btn--green">Đăng ký ngay</a>
+        </div>`;
+    } else {
+      const expiry = data.expiry ? new Date(data.expiry).toLocaleDateString('vi-VN') : 'N/A';
+      const created = data.created ? new Date(data.created).toLocaleDateString('vi-VN') : 'N/A';
+      inner.innerHTML = `
+        <div class="dr-taken">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          <div>
+            <strong>${data.domain}</strong> — Tên miền đã được đăng ký
+            <div class="dr-meta">
+              <span>Ngày đăng ký: ${created}</span>
+              <span>Hết hạn: ${expiry}</span>
+              ${data.registrar ? `<span>Nhà đăng ký: ${data.registrar}</span>` : ''}
+            </div>
+          </div>
+          <a href="/lien-he" class="dr-btn dr-btn--blue">Tư vấn tên miền khác</a>
+        </div>`;
+    }
+    result.style.display = 'block';
+  } catch (e) {
+    inner.innerHTML = `<div class="dr-error">Không thể kiểm tra lúc này, vui lòng thử lại.</div>`;
+    result.style.display = 'block';
+  }
+
+  btn.textContent = 'Kiểm Tra';
+  btn.disabled = false;
+}
+
+// Enter key
+document.getElementById('domainInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') checkDomain();
+});
+</script>
+
 <!-- ===== STATS + GIÁ TRỊ ===== -->
 <section class="stats-section">
   <div class="stats-inner">
