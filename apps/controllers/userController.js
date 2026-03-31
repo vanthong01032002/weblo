@@ -10,6 +10,7 @@ const SeoModel          = require('../models/seoModel');
 const ProcessModel      = require('../models/processModel');
 const TeamModel         = require('../models/teamModel');
 const TemplateModel     = require('../models/templateModel');
+const ClientModel       = require('../models/clientModel');
 
 // Helper: load social buttons cho mọi trang
 async function getSocialButtons() {
@@ -61,8 +62,8 @@ exports.dichVu = async (req, res) => {
 
 // trang khách hàng
 exports.khachHang = async (req, res) => {
-    const [socialButtons, socialFooter, settings] = await Promise.all([getSocialButtons(), getSocialFooter(), getSettings()]);
-    res.render('user/khach-hang', { layout: 'layouts/main', title: 'Khách hàng - Webtop', socialButtons, socialFooter, settings });
+    const [socialButtons, socialFooter, settings, clients] = await Promise.all([getSocialButtons(), getSocialFooter(), getSettings(), ClientModel.getAllActive()]);
+    res.render('user/khach-hang', { layout: 'layouts/main', title: 'Khách hàng - Webtop', socialButtons, socialFooter, settings, seo: {}, clients });
 };
 
 // trang về chúng tôi
@@ -174,47 +175,49 @@ exports.tkwPortfolio = async (req, res) => {
 const https = require('https');
 
 exports.checkDomain = async (req, res) => {
-    const domain = (req.query.domain || '').trim().toLowerCase()
-        .replace(/^https?:\/\//,'').replace(/\/.*$/,'');
+    let domain = (req.query.domain || '').trim().toLowerCase()
+        .replace(/^https?:\/\//,'').replace(/\/.*$/,'').replace(/^www\./,'');
 
-    if (!domain || !/^[a-z0-9][a-z0-9\-\.]{1,61}[a-z0-9]\.[a-z]{2,}$/.test(domain)) {
+    if (!domain) return res.json({ error: 'Vui lòng nhập tên miền' });
+    if (!domain.includes('.')) domain += '.com';
+    if (!/^[a-z0-9][a-z0-9\-\.]{0,61}[a-z0-9]\.[a-z]{2,}$/.test(domain)) {
         return res.json({ error: 'Tên miền không hợp lệ' });
     }
 
     try {
-        // Dùng RDAP (free, không cần API key)
-        const tld = domain.split('.').slice(-1)[0];
-        const rdapUrl = `https://rdap.org/domain/${domain}`;
-
-        const data = await new Promise((resolve, reject) => {
-            https.get(rdapUrl, { headers: { 'Accept': 'application/json' } }, (resp) => {
+        const rdapUrl = `https://rdap.org/domain/${encodeURIComponent(domain)}`;
+        const data = await new Promise((resolve) => {
+            const r = require('https').get(rdapUrl, {
+                headers: { 'Accept': 'application/rdap+json, application/json' },
+                timeout: 8000
+            }, (resp) => {
                 let body = '';
                 resp.on('data', chunk => body += chunk);
                 resp.on('end', () => {
                     try { resolve({ status: resp.statusCode, body: JSON.parse(body) }); }
-                    catch { resolve({ status: resp.statusCode, body: {} }); }
+                    catch { resolve({ status: resp.statusCode, body: null }); }
                 });
-            }).on('error', reject);
+            });
+            r.on('error', () => resolve({ status: 0, body: null }));
+            r.on('timeout', () => { r.destroy(); resolve({ status: 0, body: null }); });
         });
 
-        if (data.status === 200 && data.body.ldhName) {
-            // Domain đã được đăng ký
+        if (data.status === 200 && data.body) {
             const events = data.body.events || [];
-            const expiry = events.find(e => e.eventAction === 'expiration');
+            const expiry  = events.find(e => e.eventAction === 'expiration');
             const created = events.find(e => e.eventAction === 'registration');
-            return res.json({
-                domain,
-                available: false,
-                status: 'registered',
+            const registrar = data.body.entities?.find(e => e.roles?.includes('registrar'))
+                ?.vcardArray?.[1]?.find(v => v[0] === 'fn')?.[3] || null;
+            return res.json({ domain, available: false, status: 'registered',
                 expiry: expiry ? expiry.eventDate : null,
-                created: created ? created.eventDate : null,
-                registrar: data.body.entities?.[0]?.vcardArray?.[1]?.find(v => v[0] === 'fn')?.[3] || null
-            });
-        } else {
+                created: created ? created.eventDate : null, registrar });
+        }
+
+        if (data.status === 404) {
             return res.json({ domain, available: true, status: 'available' });
         }
-    } catch (err) {
-        // Fallback: nếu RDAP lỗi, thử DNS lookup
+
+        // Fallback DNS
         const dns = require('dns').promises;
         try {
             await dns.lookup(domain);
@@ -222,5 +225,7 @@ exports.checkDomain = async (req, res) => {
         } catch {
             return res.json({ domain, available: true, status: 'available' });
         }
+    } catch (err) {
+        return res.json({ error: 'Không thể kiểm tra lúc này, vui lòng thử lại.' });
     }
 };

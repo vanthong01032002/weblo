@@ -38,57 +38,30 @@
     </div>
 
     <div class="kh-testimonials__grid">
-      <div class="kh-testi-card kh-testi-card--featured">
-        <div class="kh-testi-card__quote">"</div>
-        <p>Webtop làm việc khá kỹ trong khâu tư vấn và hiểu rõ đặc thù ngành nội thất. Website sau khi hoàn thiện thể hiện được sản phẩm, hình ảnh và phong cách mà chúng tôi mong muốn. Giao diện rõ ràng, dễ xem, dễ chỉnh sửa, có gì cần hỏi thì bên Webtop luôn hỗ trợ nhiệt tình.</p>
-        <div class="kh-testi-card__author">
-          <div class="kh-testi-card__avatar">LN</div>
-          <div>
-            <strong>Mr. Lưu Phước Nguyên</strong>
-            <span>CEO Nội thất Mộc Nguyên Cường</span>
+      <% if (typeof clients !== 'undefined' && clients && clients.length > 0) { %>
+        <% clients.forEach(function(c, i) { %>
+        <div class="kh-testi-card <%= i === 0 ? 'kh-testi-card--featured' : '' %>">
+          <div class="kh-testi-card__quote">"</div>
+          <p><%= c.testimonial || '' %></p>
+          <div class="kh-testi-card__author">
+            <% if (c.avatar) { %>
+              <img src="<%= c.avatar %>" class="kh-testi-card__avatar" style="width:44px;height:44px;min-width:44px;border-radius:50%;object-fit:cover;flex-shrink:0;" alt="<%= c.full_name %>">
+            <% } else { %>
+              <div class="kh-testi-card__avatar"><%= c.full_name.charAt(0).toUpperCase() %></div>
+            <% } %>
+            <div>
+              <strong><%= c.full_name %></strong>
+              <span><%= [c.position, c.company].filter(Boolean).join(' - ') %></span>
+            </div>
+          </div>
+          <div class="kh-testi-card__stars">
+            <% for(let s=0;s<5;s++){ %><%= s < c.rating ? '★' : '☆' %><% } %>
           </div>
         </div>
-        <div class="kh-testi-card__stars">★★★★★</div>
-      </div>
-
-      <div class="kh-testi-card">
-        <div class="kh-testi-card__quote">"</div>
-        <p>Đội ngũ Webtop rất chuyên nghiệp, tư vấn tận tình và giao website đúng hạn. Chúng tôi rất hài lòng với kết quả nhận được.</p>
-        <div class="kh-testi-card__author">
-          <div class="kh-testi-card__avatar">TH</div>
-          <div>
-            <strong>Ms. Trần Hương</strong>
-            <span>Giám đốc Spa Thiên Nhiên</span>
-          </div>
-        </div>
-        <div class="kh-testi-card__stars">★★★★★</div>
-      </div>
-
-      <div class="kh-testi-card">
-        <div class="kh-testi-card__quote">"</div>
-        <p>Website sau khi làm xong đã giúp chúng tôi tăng đơn hàng online rõ rệt. SEO lên top nhanh hơn mong đợi, rất đáng đầu tư.</p>
-        <div class="kh-testi-card__author">
-          <div class="kh-testi-card__avatar">MK</div>
-          <div>
-            <strong>Mr. Minh Khoa</strong>
-            <span>Chủ chuỗi nhà hàng Mộc Chay</span>
-          </div>
-        </div>
-        <div class="kh-testi-card__stars">★★★★★</div>
-      </div>
-
-      <div class="kh-testi-card">
-        <div class="kh-testi-card__quote">"</div>
-        <p>Giao diện đẹp, tốc độ tải nhanh, hỗ trợ sau bàn giao rất tốt. Webtop thực sự là đối tác đáng tin cậy cho doanh nghiệp chúng tôi.</p>
-        <div class="kh-testi-card__author">
-          <div class="kh-testi-card__avatar">PL</div>
-          <div>
-            <strong>Ms. Phương Linh</strong>
-            <span>Marketing Manager - Công ty ABC</span>
-          </div>
-        </div>
-        <div class="kh-testi-card__stars">★★★★★</div>
-      </div>
+        <% }); %>
+      <% } else { %>
+        <p style="grid-column:1/-1;text-align:center;color:#aaa;padding:40px 0;">Chưa có đánh giá nào.</p>
+      <% } %>
     </div>
   </div>
 </section>

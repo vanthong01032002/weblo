@@ -263,4 +263,27 @@ router.post('/admin/media/templates/update/:id',  uploadTpl.single('image'), adm
 router.delete('/admin/media/templates/:id',       adminController.templateDelete);
 router.post('/admin/media/templates/toggle/:id',  adminController.templateToggle);
 
+// Clients (Khách hàng)
+const clientUploadDir = path.join(__dirname, '../../public/uploads/clients');
+if (!fs.existsSync(clientUploadDir)) fs.mkdirSync(clientUploadDir, { recursive: true });
+const uploadClient = multer({
+    storage: multer.diskStorage({
+        destination: (req, file, cb) => cb(null, clientUploadDir),
+        filename: (req, file, cb) => cb(null, 'client_' + Date.now() + path.extname(file.originalname))
+    }),
+    limits: { fileSize: 3 * 1024 * 1024 },
+    fileFilter: (req, file, cb) => {
+        const ok = /jpeg|jpg|png|gif|webp|avif/.test(path.extname(file.originalname).toLowerCase());
+        ok ? cb(null, true) : cb(new Error('Chỉ chấp nhận file ảnh'));
+    }
+});
+
+router.get('/admin/media/clients',              adminController.clientIndex);
+router.get('/admin/media/clients/create',       adminController.clientCreate);
+router.post('/admin/media/clients/store',       uploadClient.single('avatar'), adminController.clientStore);
+router.get('/admin/media/clients/edit/:id',     adminController.clientEdit);
+router.post('/admin/media/clients/update/:id',  uploadClient.single('avatar'), adminController.clientUpdate);
+router.delete('/admin/media/clients/:id',       adminController.clientDelete);
+router.post('/admin/media/clients/toggle/:id',  adminController.clientToggle);
+
 module.exports = router;

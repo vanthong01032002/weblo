@@ -1063,3 +1063,80 @@ exports.templateToggle = async (req, res) => {
     try { await TemplateModel.toggleActive(req.params.id, req.body.is_active); res.json({ success: true }); }
     catch (err) { res.json({ success: false }); }
 };
+
+// ===== KHÁCH HÀNG =====
+const ClientModel = require('../models/clientModel');
+const pathClient  = require('path');
+const fsClient    = require('fs');
+
+exports.clientIndex = async (req, res) => {
+    try {
+        const clients = await ClientModel.getAll();
+        res.render('admin/clients/index', {
+            layout: 'layouts/admin', title: 'Khách hàng của Webtop',
+            clients, success: req.query.success || null, error: req.query.error || null
+        });
+    } catch (err) { res.redirect('/admin?error=Lỗi tải khách hàng'); }
+};
+
+exports.clientCreate = (req, res) => {
+    res.render('admin/clients/form', {
+        layout: 'layouts/admin', title: 'Thêm khách hàng',
+        client: null, action: '/admin/media/clients/store'
+    });
+};
+
+exports.clientStore = async (req, res) => {
+    try {
+        const { full_name, position, company, testimonial, rating, website, display_order, is_active } = req.body;
+        const avatar = req.file ? '/uploads/clients/' + req.file.filename : null;
+        await ClientModel.create({ full_name, position, company, avatar, testimonial, rating: parseInt(rating)||5, website: website||null, display_order: parseInt(display_order)||0, is_active: is_active==='1'?1:0 });
+        res.redirect('/admin/media/clients?success=Thêm khách hàng thành công');
+    } catch (err) { res.redirect('/admin/media/clients?error=Lỗi thêm'); }
+};
+
+exports.clientEdit = async (req, res) => {
+    try {
+        const client = await ClientModel.getById(req.params.id);
+        if (!client) return res.redirect('/admin/media/clients?error=Không tìm thấy');
+        res.render('admin/clients/form', {
+            layout: 'layouts/admin', title: 'Sửa khách hàng',
+            client, action: '/admin/media/clients/update/' + client.id
+        });
+    } catch (err) { res.redirect('/admin/media/clients?error=Lỗi tải'); }
+};
+
+exports.clientUpdate = async (req, res) => {
+    try {
+        const { full_name, position, company, testimonial, rating, website, display_order, is_active } = req.body;
+        const current = await ClientModel.getById(req.params.id);
+        if (!current) return res.redirect('/admin/media/clients?error=Không tìm thấy');
+        let avatar = current.avatar;
+        if (req.file) {
+            if (avatar && avatar.startsWith('/uploads/')) {
+                const old = pathClient.join(__dirname, '../../public', avatar);
+                if (fsClient.existsSync(old)) fsClient.unlinkSync(old);
+            }
+            avatar = '/uploads/clients/' + req.file.filename;
+        }
+        await ClientModel.update(req.params.id, { full_name, position, company, avatar, testimonial, rating: parseInt(rating)||5, website: website||null, display_order: parseInt(display_order)||0, is_active: is_active==='1'?1:0 });
+        res.redirect('/admin/media/clients?success=Cập nhật thành công');
+    } catch (err) { res.redirect('/admin/media/clients?error=Lỗi cập nhật'); }
+};
+
+exports.clientDelete = async (req, res) => {
+    try {
+        const c = await ClientModel.getById(req.params.id);
+        if (c && c.avatar && c.avatar.startsWith('/uploads/')) {
+            const f = pathClient.join(__dirname, '../../public', c.avatar);
+            if (fsClient.existsSync(f)) fsClient.unlinkSync(f);
+        }
+        await ClientModel.delete(req.params.id);
+        res.json({ success: true });
+    } catch (err) { res.json({ success: false }); }
+};
+
+exports.clientToggle = async (req, res) => {
+    try { await ClientModel.toggleActive(req.params.id, req.body.is_active); res.json({ success: true }); }
+    catch (err) { res.json({ success: false }); }
+};

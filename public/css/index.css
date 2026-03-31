@@ -1448,3 +1448,42 @@ body {
   .domain-check__text h2 { font-size: 1.6rem; }
   .domain-check__btn { padding: 0 18px; font-size: 0.88rem; }
 }
+
+/* Domain suggestions */
+.dr-suggestions { margin-top: 10px; }
+.dr-suggestions p { font-size: 0.8rem; color: #888; margin-bottom: 8px; font-weight: 600; }
+
+.dr-suggest-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dr-suggest-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  border: 1px solid #e0e8f0;
+  border-radius: 8px;
+  padding: 6px 12px;
+  text-decoration: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.dr-suggest-item:hover {
+  border-color: #1565c0;
+  box-shadow: 0 2px 8px rgba(21,101,192,0.12);
+}
+
+.dr-suggest-tld {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1565c0;
+}
+
+.dr-suggest-price {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #e53935;
+}

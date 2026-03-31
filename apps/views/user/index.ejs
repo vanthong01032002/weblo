@@ -149,20 +149,39 @@ async function checkDomain() {
           <a href="/lien-he" class="dr-btn dr-btn--green">Đăng ký ngay</a>
         </div>`;
     } else {
-      const expiry = data.expiry ? new Date(data.expiry).toLocaleDateString('vi-VN') : 'N/A';
-      const created = data.created ? new Date(data.created).toLocaleDateString('vi-VN') : 'N/A';
+      const metaParts = [];
+      if (data.created) metaParts.push(`<span>Ngày đăng ký: ${new Date(data.created).toLocaleDateString('vi-VN')}</span>`);
+      if (data.expiry)  metaParts.push(`<span>Hết hạn: ${new Date(data.expiry).toLocaleDateString('vi-VN')}</span>`);
+      if (data.registrar) metaParts.push(`<span>Nhà đăng ký: ${data.registrar}</span>`);
+
+      // Gợi ý TLD thay thế kèm giá
+      const baseName = data.domain.split('.')[0];
+      const tldPrices = [
+        { tld: '.vn', price: '820.000đ' },
+        { tld: '.com.vn', price: '691.000đ' },
+        { tld: '.com', price: '350.000đ' },
+        { tld: '.net', price: '380.000đ' },
+        { tld: '.org', price: '390.000đ' },
+      ];
+      const suggestions = tldPrices
+        .filter(t => !data.domain.endsWith(t.tld))
+        .map(t => `<a href="/lien-he" class="dr-suggest-item" title="Đăng ký ${baseName}${t.tld}">
+          <span class="dr-suggest-tld">${baseName}${t.tld}</span>
+          <span class="dr-suggest-price">${t.price}</span>
+        </a>`).join('');
+
       inner.innerHTML = `
         <div class="dr-taken">
           <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-          <div>
+          <div style="flex:1;">
             <strong>${data.domain}</strong> — Tên miền đã được đăng ký
-            <div class="dr-meta">
-              <span>Ngày đăng ký: ${created}</span>
-              <span>Hết hạn: ${expiry}</span>
-              ${data.registrar ? `<span>Nhà đăng ký: ${data.registrar}</span>` : ''}
+            ${metaParts.length ? `<div class="dr-meta">${metaParts.join('')}</div>` : ''}
+            <div class="dr-suggestions">
+              <p>Gợi ý tên miền thay thế:</p>
+              <div class="dr-suggest-list">${suggestions}</div>
             </div>
           </div>
-          <a href="/lien-he" class="dr-btn dr-btn--blue">Tư vấn tên miền khác</a>
+          <a href="/lien-he" class="dr-btn dr-btn--blue" style="align-self:flex-start;">Tư vấn</a>
         </div>`;
     }
     result.style.display = 'block';
