@@ -1,13 +1,31 @@
 const SlideshowModel = require('../models/slideshowModel');
 const PricingModel   = require('../models/pricingModel');
+const { VisitorModel } = require('../models/visitorModel');
 const path = require('path');
 const fs = require('fs');
 
-exports.dashboard = (req, res) => {
-    res.render('admin/dashboard', {
-        layout: 'layouts/admin',
-        title: 'Dashboard'
-    });
+exports.dashboard = async (req, res) => {
+    try {
+        const [topIPs, browsers, devices, totalToday, totalMonth, unreadMessages] = await Promise.all([
+            VisitorModel.getTopIPs(10),
+            VisitorModel.getBrowserStats(),
+            VisitorModel.getDeviceStats(),
+            VisitorModel.getTotalToday(),
+            VisitorModel.getTotalMonth(),
+            require('../models/contactModel').getMessages().then(msgs => msgs.filter(m => !m.is_read).length).catch(() => 0)
+        ]);
+        res.render('admin/dashboard', {
+            layout: 'layouts/admin',
+            title: 'Dashboard',
+            topIPs, browsers, devices, totalToday, totalMonth, unreadMessages
+        });
+    } catch (err) {
+        console.error(err);
+        res.render('admin/dashboard', {
+            layout: 'layouts/admin', title: 'Dashboard',
+            topIPs: [], browsers: [], devices: [], totalToday: 0, totalMonth: 0, unreadMessages: 0
+        });
+    }
 };
 
 // ===== SLIDESHOW =====

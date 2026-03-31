@@ -23,7 +23,14 @@
 
     <script src="/js/admin-menu.js" defer></script>
     <script>
-    // Mobile sidebar toggle
+    // ===== DARK MODE =====
+    (function() {
+        const saved = localStorage.getItem('adminTheme') || 'light';
+        document.documentElement.setAttribute('data-theme', saved);
+    })();
+    </script>
+    <script>
+    // Mobile sidebar toggle + Dark mode
     document.addEventListener('DOMContentLoaded', function() {
         const hamburger   = document.getElementById('adminHamburger');
         const sidebar     = document.querySelector('.admin-sidebar');
@@ -54,6 +61,47 @@
                 if (window.innerWidth <= 768) closeSidebar();
             });
         });
+
+        // ===== USER DROPDOWN =====
+        const userBtn      = document.getElementById('adminUserBtn');
+        const userDropdown = document.getElementById('adminUserDropdown');
+        if (userBtn && userDropdown) {
+            userBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const isOpen = userDropdown.classList.toggle('is-open');
+                userBtn.setAttribute('aria-expanded', isOpen);
+            });
+            document.addEventListener('click', function() {
+                userDropdown.classList.remove('is-open');
+                userBtn.setAttribute('aria-expanded', 'false');
+            });
+            userDropdown.addEventListener('click', function(e) { e.stopPropagation(); });
+        }
+
+        // ===== DARK MODE TOGGLE =====
+        const themeBtn = document.getElementById('admin-topbar-theme');
+        if (themeBtn) {
+            const html    = document.documentElement;
+            const iconSun  = document.getElementById('icon-sun');
+            const iconMoon = document.getElementById('icon-moon');
+
+            function applyTheme(theme) {
+                html.setAttribute('data-theme', theme);
+                localStorage.setItem('adminTheme', theme);
+                const isDark = theme === 'dark';
+                themeBtn.classList.toggle('dark-active', isDark);
+                if (iconSun)  iconSun.style.display  = isDark ? 'none' : '';
+                if (iconMoon) iconMoon.style.display = isDark ? '' : 'none';
+            }
+
+            // Init
+            applyTheme(html.getAttribute('data-theme') || 'light');
+
+            themeBtn.addEventListener('click', function() {
+                const isDark = html.getAttribute('data-theme') === 'dark';
+                applyTheme(isDark ? 'light' : 'dark');
+            });
+        }
     });
     </script>
 </body>
