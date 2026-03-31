@@ -217,4 +217,50 @@ router.delete('/admin/media/social-footer/:id',       adminController.socialFoot
 router.post('/admin/media/social-footer/toggle/:id',  adminController.socialFooterToggle);
 router.delete('/admin/media/social-footer',           adminController.socialFooterDeleteAll);
 
+// Team members
+const teamUploadDir = path.join(__dirname, '../../public/uploads/team');
+if (!fs.existsSync(teamUploadDir)) fs.mkdirSync(teamUploadDir, { recursive: true });
+const uploadTeam = multer({
+    storage: multer.diskStorage({
+        destination: (req, file, cb) => cb(null, teamUploadDir),
+        filename: (req, file, cb) => cb(null, 'team_' + Date.now() + path.extname(file.originalname))
+    }),
+    limits: { fileSize: 3 * 1024 * 1024 },
+    fileFilter: (req, file, cb) => {
+        const ok = /jpeg|jpg|png|gif|webp|avif/.test(path.extname(file.originalname).toLowerCase());
+        ok ? cb(null, true) : cb(new Error('Chỉ chấp nhận file ảnh'));
+    }
+});
+
+router.get('/admin/media/team',              adminController.teamIndex);
+router.get('/admin/media/team/create',       adminController.teamCreate);
+router.post('/admin/media/team/store',       uploadTeam.single('image'), adminController.teamStore);
+router.get('/admin/media/team/edit/:id',     adminController.teamEdit);
+router.post('/admin/media/team/update/:id',  uploadTeam.single('image'), adminController.teamUpdate);
+router.delete('/admin/media/team/:id',       adminController.teamDelete);
+router.post('/admin/media/team/toggle/:id',  adminController.teamToggle);
+
+// Website Templates (Kho giao diện)
+const tplUploadDir = path.join(__dirname, '../../public/uploads/templates');
+if (!fs.existsSync(tplUploadDir)) fs.mkdirSync(tplUploadDir, { recursive: true });
+const uploadTpl = multer({
+    storage: multer.diskStorage({
+        destination: (req, file, cb) => cb(null, tplUploadDir),
+        filename: (req, file, cb) => cb(null, 'tpl_' + Date.now() + path.extname(file.originalname))
+    }),
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter: (req, file, cb) => {
+        const ok = /jpeg|jpg|png|gif|webp|avif/.test(path.extname(file.originalname).toLowerCase());
+        ok ? cb(null, true) : cb(new Error('Chỉ chấp nhận file ảnh'));
+    }
+});
+
+router.get('/admin/media/templates',              adminController.templateIndex);
+router.get('/admin/media/templates/create',       adminController.templateCreate);
+router.post('/admin/media/templates/store',       uploadTpl.single('image'), adminController.templateStore);
+router.get('/admin/media/templates/edit/:id',     adminController.templateEdit);
+router.post('/admin/media/templates/update/:id',  uploadTpl.single('image'), adminController.templateUpdate);
+router.delete('/admin/media/templates/:id',       adminController.templateDelete);
+router.post('/admin/media/templates/toggle/:id',  adminController.templateToggle);
+
 module.exports = router;

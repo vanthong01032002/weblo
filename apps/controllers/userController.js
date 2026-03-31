@@ -8,6 +8,8 @@ const SettingsModel     = require('../models/settingsModel');
 const BlogModel         = require('../models/blogModel');
 const SeoModel          = require('../models/seoModel');
 const ProcessModel      = require('../models/processModel');
+const TeamModel         = require('../models/teamModel');
+const TemplateModel     = require('../models/templateModel');
 
 // Helper: load social buttons cho mọi trang
 async function getSocialButtons() {
@@ -65,14 +67,18 @@ exports.khachHang = async (req, res) => {
 
 // trang về chúng tôi
 exports.veChungToi = async (req, res) => {
-    const [socialButtons, socialFooter, settings] = await Promise.all([getSocialButtons(), getSocialFooter(), getSettings()]);
-    res.render('user/ve-chung-toi', { layout: 'layouts/main', title: 'Về chúng tôi - Webtop', socialButtons, socialFooter, settings });
+    const [socialButtons, socialFooter, settings, team] = await Promise.all([
+        getSocialButtons(), getSocialFooter(), getSettings(), TeamModel.getAllActive()
+    ]);
+    res.render('user/ve-chung-toi', { layout: 'layouts/main', title: 'Về chúng tôi - Webtop', socialButtons, socialFooter, settings, seo: {}, team });
 };
 
 // kho giao diện
 exports.khoGiaoDien = async (req, res) => {
-    const [socialButtons, socialFooter, settings] = await Promise.all([getSocialButtons(), getSocialFooter(), getSettings()]);
-    res.render('user/kho-giao-dien', { layout: 'layouts/main', title: 'Kho giao diện website - Webtop', socialButtons, socialFooter, settings });
+    const [socialButtons, socialFooter, settings, templates] = await Promise.all([
+        getSocialButtons(), getSocialFooter(), getSettings(), TemplateModel.getAllActive()
+    ]);
+    res.render('user/kho-giao-dien', { layout: 'layouts/main', title: 'Kho giao diện website - Webtop', socialButtons, socialFooter, settings, seo: {}, templates });
 };
 
 // blog

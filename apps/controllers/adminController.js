@@ -867,3 +867,181 @@ exports.processToggle = async (req, res) => {
     try { await ProcessModel.toggleActive(req.params.id, req.body.is_active); res.json({ success: true }); }
     catch (err) { res.json({ success: false }); }
 };
+
+// ===== ĐỘI NGŨ =====
+const TeamModel  = require('../models/teamModel');
+const pathTeam   = require('path');
+const fsTeam     = require('fs');
+
+exports.teamIndex = async (req, res) => {
+    try {
+        const members = await TeamModel.getAll();
+        res.render('admin/team/index', {
+            layout: 'layouts/admin', title: 'Quản lý Đội ngũ',
+            members, success: req.query.success || null, error: req.query.error || null
+        });
+    } catch (err) { res.redirect('/admin?error=Lỗi tải đội ngũ'); }
+};
+
+exports.teamCreate = (req, res) => {
+    res.render('admin/team/form', {
+        layout: 'layouts/admin', title: 'Thêm thành viên',
+        member: null, action: '/admin/media/team/store'
+    });
+};
+
+exports.teamStore = async (req, res) => {
+    try {
+        const { full_name, position, facebook, linkedin, display_order, is_active } = req.body;
+        const image_path = req.file ? '/uploads/team/' + req.file.filename : null;
+        await TeamModel.create({ full_name, position, image_path, facebook: facebook||null, linkedin: linkedin||null, display_order: parseInt(display_order)||0, is_active: is_active==='1'?1:0 });
+        res.redirect('/admin/media/team?success=Thêm thành viên thành công');
+    } catch (err) { res.redirect('/admin/media/team?error=Lỗi thêm'); }
+};
+
+exports.teamEdit = async (req, res) => {
+    try {
+        const member = await TeamModel.getById(req.params.id);
+        if (!member) return res.redirect('/admin/media/team?error=Không tìm thấy');
+        res.render('admin/team/form', {
+            layout: 'layouts/admin', title: 'Sửa thành viên',
+            member, action: '/admin/media/team/update/' + member.id
+        });
+    } catch (err) { res.redirect('/admin/media/team?error=Lỗi tải'); }
+};
+
+exports.teamUpdate = async (req, res) => {
+    try {
+        const { full_name, position, facebook, linkedin, display_order, is_active } = req.body;
+        const current = await TeamModel.getById(req.params.id);
+        if (!current) return res.redirect('/admin/media/team?error=Không tìm thấy');
+        let image_path = current.image_path;
+        if (req.file) {
+            if (image_path && image_path.startsWith('/uploads/')) {
+                const old = pathTeam.join(__dirname, '../../public', image_path);
+                if (fsTeam.existsSync(old)) fsTeam.unlinkSync(old);
+            }
+            image_path = '/uploads/team/' + req.file.filename;
+        }
+        await TeamModel.update(req.params.id, { full_name, position, image_path, facebook: facebook||null, linkedin: linkedin||null, display_order: parseInt(display_order)||0, is_active: is_active==='1'?1:0 });
+        res.redirect('/admin/media/team?success=Cập nhật thành công');
+    } catch (err) { res.redirect('/admin/media/team?error=Lỗi cập nhật'); }
+};
+
+exports.teamDelete = async (req, res) => {
+    try {
+        const m = await TeamModel.getById(req.params.id);
+        if (m && m.image_path && m.image_path.startsWith('/uploads/')) {
+            const f = pathTeam.join(__dirname, '../../public', m.image_path);
+            if (fsTeam.existsSync(f)) fsTeam.unlinkSync(f);
+        }
+        await TeamModel.delete(req.params.id);
+        res.json({ success: true });
+    } catch (err) { res.json({ success: false }); }
+};
+
+exports.teamToggle = async (req, res) => {
+    try { await TeamModel.toggleActive(req.params.id, req.body.is_active); res.json({ success: true }); }
+    catch (err) { res.json({ success: false }); }
+};
+
+// ===== KHO GIAO DIỆN =====
+const TemplateModel = require('../models/templateModel');
+const pathTpl = require('path');
+const fsTpl   = require('fs');
+
+const CATEGORIES = [
+  { value: 'bds',     label: 'Bất động sản' },
+  { value: 'fnb',     label: 'F&B' },
+  { value: 'noithat', label: 'Nội thất' },
+  { value: 'dulich',  label: 'Du lịch' },
+  { value: 'giaoduc', label: 'Giáo dục' },
+  { value: 'lamdep',  label: 'Làm đẹp' },
+  { value: 'banhang', label: 'Bán hàng' },
+  { value: 'xaydung', label: 'Xây dựng' },
+  { value: 'khac',    label: 'Khác' },
+];
+
+exports.templateIndex = async (req, res) => {
+    try {
+        const templates = await TemplateModel.getAll();
+        res.render('admin/templates/index', {
+            layout: 'layouts/admin', title: 'Kho giao diện Website',
+            templates, success: req.query.success || null, error: req.query.error || null
+        });
+    } catch (err) { res.redirect('/admin?error=Lỗi tải kho giao diện'); }
+};
+
+exports.templateCreate = (req, res) => {
+    res.render('admin/templates/form', {
+        layout: 'layouts/admin', title: 'Thêm giao diện',
+        tpl: null, action: '/admin/media/templates/store', CATEGORIES
+    });
+};
+
+exports.templateStore = async (req, res) => {
+    try {
+        const { name, category, description, uses, is_hot, display_order, is_active } = req.body;
+        const cat = CATEGORIES.find(c => c.value === category) || { label: 'Khác' };
+        const image_path = req.file ? '/uploads/templates/' + req.file.filename : null;
+        await TemplateModel.create({
+            name, category: category||'khac', category_label: cat.label,
+            description, image_path, uses: parseInt(uses)||0,
+            is_hot: is_hot==='1'?1:0, display_order: parseInt(display_order)||0,
+            is_active: is_active==='1'?1:0
+        });
+        res.redirect('/admin/media/templates?success=Thêm giao diện thành công');
+    } catch (err) { res.redirect('/admin/media/templates?error=Lỗi thêm'); }
+};
+
+exports.templateEdit = async (req, res) => {
+    try {
+        const tpl = await TemplateModel.getById(req.params.id);
+        if (!tpl) return res.redirect('/admin/media/templates?error=Không tìm thấy');
+        res.render('admin/templates/form', {
+            layout: 'layouts/admin', title: 'Sửa giao diện',
+            tpl, action: '/admin/media/templates/update/' + tpl.id, CATEGORIES
+        });
+    } catch (err) { res.redirect('/admin/media/templates?error=Lỗi tải'); }
+};
+
+exports.templateUpdate = async (req, res) => {
+    try {
+        const { name, category, description, uses, is_hot, display_order, is_active } = req.body;
+        const current = await TemplateModel.getById(req.params.id);
+        if (!current) return res.redirect('/admin/media/templates?error=Không tìm thấy');
+        const cat = CATEGORIES.find(c => c.value === category) || { label: 'Khác' };
+        let image_path = current.image_path;
+        if (req.file) {
+            if (image_path && image_path.startsWith('/uploads/')) {
+                const old = pathTpl.join(__dirname, '../../public', image_path);
+                if (fsTpl.existsSync(old)) fsTpl.unlinkSync(old);
+            }
+            image_path = '/uploads/templates/' + req.file.filename;
+        }
+        await TemplateModel.update(req.params.id, {
+            name, category: category||'khac', category_label: cat.label,
+            description, image_path, uses: parseInt(uses)||0,
+            is_hot: is_hot==='1'?1:0, display_order: parseInt(display_order)||0,
+            is_active: is_active==='1'?1:0
+        });
+        res.redirect('/admin/media/templates?success=Cập nhật thành công');
+    } catch (err) { res.redirect('/admin/media/templates?error=Lỗi cập nhật'); }
+};
+
+exports.templateDelete = async (req, res) => {
+    try {
+        const tpl = await TemplateModel.getById(req.params.id);
+        if (tpl && tpl.image_path && tpl.image_path.startsWith('/uploads/')) {
+            const f = pathTpl.join(__dirname, '../../public', tpl.image_path);
+            if (fsTpl.existsSync(f)) fsTpl.unlinkSync(f);
+        }
+        await TemplateModel.delete(req.params.id);
+        res.json({ success: true });
+    } catch (err) { res.json({ success: false }); }
+};
+
+exports.templateToggle = async (req, res) => {
+    try { await TemplateModel.toggleActive(req.params.id, req.body.is_active); res.json({ success: true }); }
+    catch (err) { res.json({ success: false }); }
+};

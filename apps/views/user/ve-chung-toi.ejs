@@ -129,66 +129,31 @@
       <p>Đội ngũ chuyên gia giàu kinh nghiệm, đam mê và tận tâm với từng dự án.</p>
     </div>
     <div class="about-team__grid">
-      <div class="about-team-card">
-        <div class="about-team-card__avatar">
-          <img src="/images/hero-small.png" alt="CEO">
-          <div class="about-team-card__social">
-            <a href="#" aria-label="Facebook">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
-            </a>
-            <a href="#" aria-label="LinkedIn">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
-            </a>
+      <% if (typeof team !== 'undefined' && team && team.length > 0) { %>
+        <% team.forEach(function(m) { %>
+        <div class="about-team-card">
+          <div class="about-team-card__avatar">
+            <img src="<%= m.image_path || '/images/default.png' %>" alt="<%= m.full_name %>">
+            <div class="about-team-card__social">
+              <% if (m.facebook) { %>
+              <a href="<%= m.facebook %>" target="_blank" aria-label="Facebook">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+              </a>
+              <% } %>
+              <% if (m.linkedin) { %>
+              <a href="<%= m.linkedin %>" target="_blank" aria-label="LinkedIn">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+              </a>
+              <% } %>
+            </div>
           </div>
+          <h4><%= m.full_name %></h4>
+          <span><%= m.position || '' %></span>
         </div>
-        <h4>Nguyễn Văn A</h4>
-        <span>CEO & Founder</span>
-      </div>
-      <div class="about-team-card">
-        <div class="about-team-card__avatar">
-          <img src="/images/hero-main.png" alt="CTO">
-          <div class="about-team-card__social">
-            <a href="#" aria-label="Facebook">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
-            </a>
-            <a href="#" aria-label="LinkedIn">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
-            </a>
-          </div>
-        </div>
-        <h4>Trần Thị B</h4>
-        <span>CTO & Lead Developer</span>
-      </div>
-      <div class="about-team-card">
-        <div class="about-team-card__avatar">
-          <img src="/images/tab-combo1.png" alt="Designer">
-          <div class="about-team-card__social">
-            <a href="#" aria-label="Facebook">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
-            </a>
-            <a href="#" aria-label="LinkedIn">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
-            </a>
-          </div>
-        </div>
-        <h4>Lê Văn C</h4>
-        <span>UI/UX Designer</span>
-      </div>
-      <div class="about-team-card">
-        <div class="about-team-card__avatar">
-          <img src="/images/tab-combo2.png" alt="SEO">
-          <div class="about-team-card__social">
-            <a href="#" aria-label="Facebook">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
-            </a>
-            <a href="#" aria-label="LinkedIn">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
-            </a>
-          </div>
-        </div>
-        <h4>Phạm Thị D</h4>
-        <span>SEO Specialist</span>
-      </div>
+        <% }); %>
+      <% } else { %>
+        <p style="grid-column:1/-1;text-align:center;color:#aaa;padding:40px 0;">Chưa có thành viên nào.</p>
+      <% } %>
     </div>
   </div>
 </section>
